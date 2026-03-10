@@ -1,0 +1,42 @@
+# Coolify: use this with "Docker Compose" resource.
+# 1. Replace image with your Coolify-built image or registry image (e.g. user/repo:latest).
+# 2. Set env vars in Coolify (APP_KEY, APP_URL, DB_*); they inject into this file.
+# 3. Enable "Connect To Predefined Network" so the app can reach PostgreSQL.
+# 4. In Domains enter your domain with port 80 (e.g. https://your-domain.com:80).
+#
+# After first deploy: fix storage permissions via Coolify → Command Center → server:
+#   mkdir -p <STORAGE_VOLUME_PATH>/framework/{sessions,views,cache}
+#   chmod -R 775 <STORAGE_VOLUME_PATH>/framework
+
+services:
+  app:
+    image: ${DOCKER_IMAGE:-nasiroli:latest}
+    volumes:
+      - ./storage:/var/www/html/storage
+    environment:
+      AUTORUN_ENABLED: ${AUTORUN_ENABLED:-true}
+      APP_ENV: ${APP_ENV:-production}
+      APP_DEBUG: ${APP_DEBUG:-false}
+      APP_KEY: ${APP_KEY}
+      APP_URL: ${APP_URL}
+      DB_CONNECTION: pgsql
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT:-5432}
+      DB_DATABASE: ${DB_DATABASE}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+
+  scheduler:
+    image: ${DOCKER_IMAGE:-nasiroli:latest}
+    command: ["php", "/var/www/html/artisan", "schedule:work"]
+    volumes:
+      - ./storage:/var/www/html/storage
+    environment:
+      APP_KEY: ${APP_KEY}
+      APP_ENV: ${APP_ENV:-production}
+      DB_CONNECTION: pgsql
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT:-5432}
+      DB_DATABASE: ${DB_DATABASE}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
