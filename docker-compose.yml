@@ -1,0 +1,43 @@
+# Local development: app + PostgreSQL. Run with: docker compose up --build
+# Requires .env with at least APP_KEY and APP_URL=http://localhost (or leave APP_KEY empty and run key:generate after first up).
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    environment:
+      APP_ENV: local
+      APP_DEBUG: "true"
+      APP_URL: http://localhost:8080
+      DB_CONNECTION: pgsql
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_DATABASE: nasiroli
+      DB_USERNAME: nasiroli
+      DB_PASSWORD: secret
+      AUTORUN_ENABLED: "true"
+    env_file:
+      - .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: nasiroli
+      POSTGRES_USER: nasiroli
+      POSTGRES_PASSWORD: secret
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nasiroli -d nasiroli"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
