@@ -1,8 +1,16 @@
 # Multi-stage build for Laravel on Coolify (PostgreSQL)
+# Vendor stage: Filament theme CSS is resolved from vendor/ during Vite build
+FROM php:8.5-cli-alpine AS vendor
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+WORKDIR /app
+COPY composer.json composer.lock ./
+RUN composer install --no-dev --optimize-autoloader --no-scripts --no-interaction --ignore-platform-reqs
+
 FROM oven/bun:1-alpine AS frontend
 WORKDIR /app
 COPY package.json bun.lock* ./
 RUN bun install --frozen-lockfile
+COPY --from=vendor /app/vendor ./vendor
 COPY resources resources
 COPY vite.config.js ./
 COPY public public
