@@ -48,7 +48,7 @@ Run the app and a PostgreSQL database in containers using Docker Compose.
 | Service   | Image / build      | Port (host) | Notes                          |
 |----------|--------------------|-------------|---------------------------------|
 | `app`    | Built from `Dockerfile` | 8080 → 80   | Laravel (Nginx + PHP-FPM)       |
-| `postgres` | `postgres:17-alpine`   | —           | DB: `nasiro_li`, user: `nasiro_li`, password: `secret` |
+| `postgres` | `postgres:17-alpine`   | —           | DB: `nasiroli`, user: `nasiroli`, password: `secret` |
 
 Database credentials are set in `docker-compose.yml` and passed to the app; you can change them there and in `.env` if you override `DB_*` for other tooling.
 
